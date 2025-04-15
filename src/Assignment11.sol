@@ -18,6 +18,14 @@ contract Assignment11 {
     function contribute() public payable {
         require(msg.value < 0.001 ether);
         contributions[msg.sender] += msg.value;
+        /* @audit-issue: Ownership can be stolen becuase the comparision based on `contributions[msg.sender]` (from `msg.value`), was sent in the last transaction,
+        not comparing the real account balances between Owner and Attacker */
+        /* @Patch:
+
+            if (address(this).balance > address(owner).balance) {
+            owner = msg.sender;
+        }*/
+       
         if (contributions[msg.sender] > contributions[owner]) {
             owner = msg.sender;
         }
